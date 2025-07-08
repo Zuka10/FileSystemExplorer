@@ -10,14 +10,14 @@ namespace FileSystemExplorer.ViewModels;
 
 public class MainViewModel : INotifyPropertyChanged
 {
-    private ObservableCollection<DirectoryItem> _directoryTree;
-    private ObservableCollection<FileItem> _filesList;
-    private string _currentPath;
-    private FileItem _selectedFile;
-    private string _statusMessage;
+    private ObservableCollection<DirectoryItem>? _directoryTree;
+    private ObservableCollection<FileItem>? _filesList;
+    private string? _currentPath;
+    private FileItem? _selectedFile;
+    private string? _statusMessage;
     private bool _isLoading;
 
-    public ObservableCollection<DirectoryItem> DirectoryTree
+    public ObservableCollection<DirectoryItem>? DirectoryTree
     {
         get => _directoryTree;
         set
@@ -27,7 +27,7 @@ public class MainViewModel : INotifyPropertyChanged
         }
     }
 
-    public ObservableCollection<FileItem> FilesList
+    public ObservableCollection<FileItem>? FilesList
     {
         get => _filesList;
         set
@@ -37,7 +37,7 @@ public class MainViewModel : INotifyPropertyChanged
         }
     }
 
-    public string CurrentPath
+    public string? CurrentPath
     {
         get => _currentPath;
         set
@@ -47,7 +47,7 @@ public class MainViewModel : INotifyPropertyChanged
         }
     }
 
-    public FileItem SelectedFile
+    public FileItem? SelectedFile
     {
         get => _selectedFile;
         set
@@ -57,7 +57,7 @@ public class MainViewModel : INotifyPropertyChanged
         }
     }
 
-    public string StatusMessage
+    public string? StatusMessage
     {
         get => _statusMessage;
         set
@@ -77,23 +77,23 @@ public class MainViewModel : INotifyPropertyChanged
         }
     }
 
-    public ICommand NavigateUpCommand { get; }
-    public ICommand RefreshCommand { get; }
-    public ICommand CreateFolderCommand { get; }
-    public ICommand DeleteItemCommand { get; }
-    public ICommand RenameItemCommand { get; }
-    public ICommand CopyItemCommand { get; }
-    public ICommand PasteItemCommand { get; }
-    public ICommand OpenItemCommand { get; }
-    public ICommand TreeItemSelectedCommand { get; }
+    public ICommand? NavigateUpCommand { get; }
+    public ICommand? RefreshCommand { get; }
+    public ICommand? CreateFolderCommand { get; }
+    public ICommand? DeleteItemCommand { get; }
+    public ICommand? RenameItemCommand { get; }
+    public ICommand? CopyItemCommand { get; }
+    public ICommand? PasteItemCommand { get; }
+    public ICommand? OpenItemCommand { get; }
+    public ICommand? TreeItemSelectedCommand { get; }
 
-    private FileItem _copiedItem;
-    public event FolderSelectedEventHandler FolderSelected;
+    private FileItem? _copiedItem;
+    public event FolderSelectedEventHandler? FolderSelected;
 
     public MainViewModel()
     {
-        DirectoryTree = new ObservableCollection<DirectoryItem>();
-        FilesList = new ObservableCollection<FileItem>();
+        DirectoryTree = [];
+        FilesList = [];
 
         NavigateUpCommand = new RelayCommand(NavigateUp, CanNavigateUp);
         RefreshCommand = new RelayCommand(Refresh);
@@ -113,7 +113,15 @@ public class MainViewModel : INotifyPropertyChanged
         try
         {
             IsLoading = true;
-            DirectoryTree.Clear();
+
+            if (DirectoryTree == null)
+            {
+                DirectoryTree = [];
+            }
+            else
+            {
+                DirectoryTree.Clear();
+            }
 
             var drives = DriveInfo.GetDrives().Where(d => d.IsReady);
             foreach (var drive in drives)
@@ -139,7 +147,7 @@ public class MainViewModel : INotifyPropertyChanged
         }
     }
 
-    private bool HasSubDirectories(string path)
+    private static bool HasSubDirectories(string path)
     {
         try
         {
@@ -187,7 +195,16 @@ public class MainViewModel : INotifyPropertyChanged
         try
         {
             IsLoading = true;
-            FilesList.Clear();
+
+            if (FilesList == null)
+            {
+                FilesList = [];
+            }
+            else
+            {
+                FilesList.Clear();
+            }
+
             CurrentPath = path;
 
             var directory = new DirectoryInfo(path);
@@ -259,7 +276,7 @@ public class MainViewModel : INotifyPropertyChanged
         return !string.IsNullOrEmpty(CurrentPath) && Directory.GetParent(CurrentPath) != null;
     }
 
-    private void Refresh(object parameter)
+    private void Refresh(object? parameter)
     {
         if (!string.IsNullOrEmpty(CurrentPath))
         {
@@ -308,6 +325,7 @@ public class MainViewModel : INotifyPropertyChanged
         {
             try
             {
+                string fileName = SelectedFile.Name;
                 if (SelectedFile.IsDirectory)
                 {
                     Directory.Delete(SelectedFile.FullPath, true);
@@ -318,7 +336,7 @@ public class MainViewModel : INotifyPropertyChanged
                 }
 
                 Refresh(null);
-                StatusMessage = $"'{SelectedFile.Name}' deleted successfully";
+                StatusMessage = $"'{fileName}' deleted successfully";
             }
             catch (Exception ex)
             {
@@ -343,7 +361,7 @@ public class MainViewModel : INotifyPropertyChanged
         {
             try
             {
-                var newPath = Path.Combine(Path.GetDirectoryName(SelectedFile.FullPath), newName);
+                var newPath = Path.Combine(Path.GetDirectoryName(SelectedFile.FullPath)!, newName);
 
                 if (SelectedFile.IsDirectory)
                 {
@@ -462,7 +480,7 @@ public class MainViewModel : INotifyPropertyChanged
         FolderSelected?.Invoke(this, new FolderSelectedEventArgs(folderPath));
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
     protected virtual void OnPropertyChanged(string propertyName)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

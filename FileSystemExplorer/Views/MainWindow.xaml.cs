@@ -21,18 +21,16 @@ public partial class MainWindow : Window
     {
         if (e.NewValue is DirectoryItem selectedItem && DataContext is MainViewModel viewModel)
         {
-            viewModel.TreeItemSelectedCommand.Execute(selectedItem);
+            viewModel.TreeItemSelectedCommand!.Execute(selectedItem);
         }
     }
 
     private void ListView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-        if (sender is ListView listView && listView.SelectedItem is FileItem selectedFile)
+        if (sender is ListView listView && listView.SelectedItem is FileItem selectedFile
+            && DataContext is MainViewModel viewModel)
         {
-            if (DataContext is MainViewModel viewModel)
-            {
-                viewModel.OpenItemCommand.Execute(selectedFile);
-            }
+            viewModel.OpenItemCommand!.Execute(selectedFile);
         }
     }
 

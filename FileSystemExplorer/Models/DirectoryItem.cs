@@ -10,7 +10,7 @@ public class DirectoryItem : FileItem
 
     public DirectoryItem()
     {
-        Children = new ObservableCollection<DirectoryItem>();
+        Children = [];
         IsDirectory = true;
     }
 }
